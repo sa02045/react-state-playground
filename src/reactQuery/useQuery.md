@@ -126,3 +126,51 @@ useQuery(["todos", todoId], async () => {
 ## 병렬 쿼리(Parallel Queries)
 
 동시에 실행하는 쿼리들을 작성해보자
+병렬적으로 쿼리를 실행하려면 별다른 노력없이 다음처럼 사용하면 된다
+
+```js
+function App () {
+   // The following queries will execute in parallel
+   const usersQuery = useQuery('users', fetchUsers)
+   const teamsQuery = useQuery('teams', fetchTeams)
+   const projectsQuery = useQuery('projects', fetchProjects)
+   ...
+ }
+```
+
+## Query Retries
+
+쿼리가 실패하게 되면 reactQuery는 자동으로 정해진 횟수만큼 재요청을 보내게 됩니다.
+이때 `retry` 옵션으로 재요청할 횟수를 설정할 수 있습니다.
+
+```js
+const result = useQuery(["todos", 1], fetchTodoListPage, {
+  retry: 10,
+});
+```
+
+- `retry:true` : 무한대로 재요청
+- `retry:false` : 재요청하지 않음
+
+### Retry Delay
+
+기본적으로 재요청을 보낼 때 딜레이가 있다. `1000ms`부터 시작해서 두배씩 걸린다
+`QueryClien` 기본 설정을 바꿔 딜레이를 조절할 수 있다.
+
+```js
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+  },
+});
+```
+
+만약 위의 경우처럼 함수가 아닌 숫자라면 항상 똑같은 딜레이로 재요청을 보내게 된다
+
+```js
+const result = useQuery("todos", fetchTodoList, {
+  retryDelay: 1000,
+});
+```
