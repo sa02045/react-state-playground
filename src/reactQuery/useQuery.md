@@ -61,3 +61,68 @@ if (status === "error") {
   return <span>Error: {error.message}</span>;
 }
 ```
+
+# useTodos Custom Hook 작성하기
+
+useTodos 커스텀훅을 작성해서 불러올 수 있습니다
+
+```js
+import { useQuery } from "react-query";
+
+const getTodos = async () => {
+  const response = await fetch("https://jsonplaceholder.typicode.com/todos");
+  return response.json();
+};
+
+export default function useTodos() {
+  return useQuery("todos", getTodos);
+}
+
+// TodoList.jsx
+
+const { isLoading, isError, data, error } = useTodos();
+```
+
+- 로직을 분리할 수 있어서 코드가 간결해졌습니다
+
+## 쿼리가 변수에 의존하는 경우
+
+Query key는 `문자열` 또는 `배열`을 키로 가집니다
+만약 쿼리함수가 변수에 의존하는경우 배열 쿼리 키에 의존하는 변수를 추가합니다
+
+```js
+const result = useQuery(["todos", todoId], () => fetchTodoById(todoId));
+```
+
+- 쿼리함수 `fetchTodoById`는 변수 todoId에 의존합니다.
+- 배열로 이루어진 쿼리 Key에 todoId를 추가합니다
+
+```js
+function Todos({ status, page }) {
+  const result = useQuery(["todos", { status, page }], fetchTodoList);
+}
+
+function fetchTodoList({ queryKey }) {
+  const [_key, { status, page }] = queryKey;
+  return new Promise();
+}
+```
+
+## fetch 함수를 사용하는 경우 쿼리 함수의 에러처리
+
+fetch API는 HTTP 통신이 실패했을 경우 에러를 throw하지 않습니다. response 객체에 들어있는
+status를 확인해 에러를 throw 해야합니다
+
+```js
+useQuery(["todos", todoId], async () => {
+  const response = await fetch("/todos/" + todoId);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+});
+```
+
+## 병렬 쿼리(Parallel Queries)
+
+동시에 실행하는 쿼리들을 작성해보자

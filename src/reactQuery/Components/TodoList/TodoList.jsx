@@ -1,13 +1,7 @@
 import React from "react";
-import { useQuery } from "react-query";
-
+import useTodos from "../../Hooks/useTodos";
 function TodoList() {
-  const fetchTodolist = () => {
-    return fetch("https://jsonplaceholder.typicode.com/todos");
-  };
-
-  const { isLoading, isError, data, error } = useQuery("todos", fetchTodolist);
-
+  const { isLoading, isError, data, error } = useTodos();
   if (isLoading) {
     return <div>Loading</div>;
   }
