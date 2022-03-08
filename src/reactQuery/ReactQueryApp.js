@@ -6,8 +6,8 @@ const queryClient = new QueryClient();
 function ReactQueryApp() {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <TodoList /> */}
-      <PostList />
+      <TodoList />
+      {/* <PostList /> */}
     </QueryClientProvider>
   );
 }
