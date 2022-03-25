@@ -8,10 +8,7 @@ const getPostById = async (id) => {
 };
 
 const usePost = (id) => {
-  const { data, isError, isLoading } = useQuery(["post", id], () =>
-    getPostById(id)
-  );
-  return { data, isError, isLoading };
+  return useQuery(["post", id], () => getPostById(id));
 };
 
 export default usePost;
